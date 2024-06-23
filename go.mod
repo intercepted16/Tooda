@@ -1,4 +1,4 @@
-module todo-app
+module Tooda
 
 go 1.21
 
