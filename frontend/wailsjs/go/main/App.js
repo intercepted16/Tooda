@@ -6,6 +6,10 @@ export function AddTodo(arg1) {
   return window['go']['main']['App']['AddTodo'](arg1);
 }
 
+export function CheckTodo(arg1) {
+  return window['go']['main']['App']['CheckTodo'](arg1);
+}
+
 export function GetTodos() {
   return window['go']['main']['App']['GetTodos']();
 }

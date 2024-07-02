@@ -12,7 +12,9 @@ type App struct {
 	ctx context.Context
 }
 
-var todos = []string{}
+type Todos map[string]bool
+
+var todos = Todos{}
 
 // NewApp creates a new App application struct
 func NewApp() *App {
@@ -34,7 +36,7 @@ func (a *App) Test() string {
 	return "Hello World"
 }
 
-func (a *App) GetTodos() []string {
+func (a *App) GetTodos() Todos {
 	return todos
 }
 
@@ -57,15 +59,13 @@ func (a *App) GetWindowsTheme() (string, error) {
 }
 
 func (a *App) AddTodo(todo string) {
-	todos = append(todos, todo)
+	todos[todo] = false
 }
 
 func (a *App) RemoveTodo(todo string) {
-	for i, t := range todos {
-		if t == todo {
-			todos = append(todos[:i], todos[i+1:]...)
-			break
-		}
-	}
+	delete(todos, todo)
+}
 
+func (a *App) CheckTodo(todo string) {
+	todos[todo] = !todos[todo]
 }

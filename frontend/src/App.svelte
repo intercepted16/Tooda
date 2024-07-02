@@ -1,10 +1,10 @@
 <script lang="ts">
   import "./app.css";
-  import { AddTodo, GetTodos, RemoveTodo } from "../wailsjs/go/main/App.js";
+  import { AddTodo, GetTodos, RemoveTodo, CheckTodo } from "../wailsjs/go/main/App.js";
   import { onMount } from "svelte";
-  let todosArray = [];
+  let todos: { [key: string]: boolean } = {};
   onMount(async () => {
-    todosArray = await GetTodos();
+    todos = await GetTodos();
   });
   let input: HTMLInputElement;
   let errors = false;
@@ -17,21 +17,39 @@
       }
     }
   }
+  const onCheckBoxClick = async (e: EventTarget) => {
+    if (!(e instanceof HTMLInputElement)) {
+      console.error("Event target is not an HTMLInputElement");
+      return 1;
+    }
+    await CheckTodo(e.value);
+    todos = await GetTodos();
+    console.log(todos);
+  };
 </script>
 
 <main class="mx-auto mt-2">
   <div class="flex flex-col justify-center items-center mx-auto">
     <h2 class="text-2xl font-bold">Todos</h2>
     <ul class="flex flex-col items-center">
-      {#each todosArray as todo}
+      {#each Object.entries(todos) as [todo, checked]}
         <li
-          class="sm:space-x-2 items-center justify-center flex flex-col sm:block p-2 space-y-3 sm:space-y-0">
-          <span>{todo}</span>
+          class="sm:space-x-2 items-center justify-center flex flex-col p-2 space-y-2 sm:space-y-2">
+          <label class="flex items-center space-x-2 mx-auto justify-items-center">
+            <!-- Really annoying Sv -->
+            <input
+              class="checkbox"
+              type="checkbox"
+              value={todo}
+              {checked}
+              on:click={(e) => onCheckBoxClick(e.target)} />
+            <p>{todo}</p>
+          </label>
           <button
             class="btn variant-filled-error"
             on:click={async () => {
               await RemoveTodo(todo);
-              todosArray = await GetTodos();
+              todos = await GetTodos();
             }}>Remove todo</button>
         </li>
       {/each}
@@ -47,7 +65,7 @@
         return;
       }
       await AddTodo(input.value);
-      todosArray = await GetTodos();
+      todos = await GetTodos();
       input.value = ""; // Clear the input after adding a todo
     }}>
     <label for="todo" class="label text-lg font-bold">Add a new todo</label>
